@@ -15,5 +15,20 @@
 export type SenasteSvar<T> = { gammal: true } | { gammal: false; data: T };
 
 export function senasteVinner<A extends unknown[], T>(fn: (...args: A) => Promise<T>): (...args: A) => Promise<SenasteSvar<T>> {
-  // TODO
+  let senasteNummer = 0;
+  return async (...args: A) => {
+    const mittNummer = ++senasteNummer;
+    try {
+      const data = await fn(...args);
+      if (mittNummer !== senasteNummer) {
+        return { gammal: true };
+      }
+      return { gammal: false, data };
+    } catch (fel) {
+      if (mittNummer !== senasteNummer) {
+        return { gammal: true };
+      }
+      throw fel;
+    }
+  };
 }
