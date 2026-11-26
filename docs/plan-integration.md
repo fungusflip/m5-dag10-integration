@@ -25,4 +25,13 @@ byt stad -> laddaVader -> "Laddar..." -> hamtaVaderSenaste
 ```
 
 ## Testnoteringar
-(fylls i efter steg 7)
+Testat i webbläsaren mot vite dev-servern. Alla 51 tester på tests.html är gröna.
+
+- Byta stad flera gånger snabbt: jag gjorde första anropet långsamt (1,5 s) och bytte Kiruna och sedan Malmö direkt. Sidan visade Malmö. Det fungerade, tack vare `senasteVinner`.
+- Offline: felrutan "Kunde inte nå servern" och knappen *Försök igen* kom upp. När nätet var tillbaka fungerade knappen och Göteborg visades.
+- Filter medan rekommendationen är aktiv: på *Drycker* ligger markeringen kvar på 3 rätter. På *Bakverk* finns inga markerade rätter, vilket är rätt eftersom rekommendationen i det vädret är drycker.
+- Ladda om: väder, rekommendationsrad och markering kommer upp igen.
+
+Det jag fick tänka på: `vaderFetch` sparar en referens till `fetch` när sidan startar. Därför gick det inte att byta ut `window.fetch` i konsolen för att fejka långsamt nät eller offline. Jag ändrade tillfälligt raden till `window.fetch(u)` för att testa och ändrade tillbaka sen.
+
+Jag har inte provsatt Slow 3G i DevTools utan fejkat fördröjningen i koden.
