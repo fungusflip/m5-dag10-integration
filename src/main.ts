@@ -127,7 +127,14 @@ let senastVader: Vader | null = null
 //   - Spara resultatet av rekommendera(vader, meny) i aktuellRekommendation.
 //   - Visa rubriken med visaRekommendation(vaderResultat, ...).
 //   - Markera rätterna med markeraRekommenderade(lista, ...). Skicka in en lista med id:n (ratter.map(...)).
-function tillampaRekommendation(vader: Vader): void {}
+function tillampaRekommendation(vader: Vader): void {
+    aktuellRekommendation = rekommendera(vader, meny)
+    visaRekommendation(vaderResultat, aktuellRekommendation.rubrik)
+    markeraRekommenderade(
+        lista,
+        aktuellRekommendation.ratter.map((r) => r.id)
+    )
+}
 
 // TODO 3: Skriv laddaVader(). Den ska:
 //   1. Hämta staden: hittaStad(stadVal.value).
@@ -141,13 +148,39 @@ function tillampaRekommendation(vader: Vader): void {}
 //      Annars tillstand({ typ: "klar", data: { stad: stad.namn, vader: svar.data } }).
 //   5. catch (fel): tillstand({ typ: "fel", meddelande: ... }). Fel är unknown:
 //        fel instanceof Error ? fel.message : String(fel)
-async function laddaVader(): Promise<void> {}
+async function laddaVader(): Promise<void> {
+    const stad = hittaStad(stadVal.value)
+    function tillstand(t: DataTillstand<VaderData>): void {
+        vaderKnapp.disabled = t.typ === 'laddar'
+        visaTillstand(vaderResultat, t, {
+            vidForsokIgen: laddaVader,
+            visaKlar: (container, klar) => {
+                senastVader = klar.data.vader
+                visaVader(container, klar.data.stad, klar.data.vader)
+                tillampaRekommendation(klar.data.vader)
+            }
+        })
+    }
+    tillstand({ typ: 'laddar' })
+    try {
+        const svar = await hamtaVaderSenaste(stad)
+        if (svar.gammal) {
+            return
+        }
+        tillstand({ typ: 'klar', data: { stad: stad.namn, vader: svar.data } })
+    } catch (fel) {
+        tillstand({ typ: 'fel', meddelande: fel instanceof Error ? fel.message : String(fel) })
+    }
+}
 vaderForm.addEventListener('submit', (handelse) => {
     handelse.preventDefault()
     laddaVader()
 })
 // TODO 4: Hämta vädret direkt när användaren byter stad: lyssna på "change" på stadVal och anropa laddaVader.
 //   Då kan två anrop vara på väg samtidigt. Det är precis det senasteVinner är till för.
+stadVal.addEventListener('change', () => {
+    laddaVader()
+})
 
 // ---- Start ----
 visaOrder(orderRef, order, meny)
