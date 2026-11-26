@@ -128,6 +128,7 @@ let senastVader: Vader | null = null
 //   - Visa rubriken med visaRekommendation(vaderResultat, ...).
 //   - Markera rätterna med markeraRekommenderade(lista, ...). Skicka in en lista med id:n (ratter.map(...)).
 function tillampaRekommendation(vader: Vader): void {
+    // sparar resultatet så ritaMeny kan markera igen efter filterbyte
     aktuellRekommendation = rekommendera(vader, meny)
     visaRekommendation(vaderResultat, aktuellRekommendation.rubrik)
     markeraRekommenderade(
