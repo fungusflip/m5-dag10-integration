@@ -20,5 +20,24 @@
 import type { Ratt, Vader, Rekommendation } from "./typer";
 
 export function rekommendera(vader: Vader, meny: Ratt[]): Rekommendation {
-  // TODO
+  if (!vader) {
+    throw new Error("Väder saknas");
+  }
+  let rubrik: string;
+  let ratter: Ratt[];
+  if (vader.temperatur < 10) {
+    rubrik = "Kyligt ute: något varmt i koppen?";
+    ratter = meny.filter((r) => r.kategori === "dryck" && r.servering === "varm");
+  } else if (vader.temperatur >= 20) {
+    rubrik = "Varmt ute: något kallt?";
+    ratter = meny.filter((r) => r.kategori === "dryck" && r.servering === "kall");
+  } else {
+    rubrik = "Skönt väder: ett bakverk till fikat?";
+    ratter = meny.filter((r) => r.kategori === "bakverk");
+  }
+  if (vader.kod >= 51) {
+    ratter = [...ratter, ...meny.filter((r) => r.kategori === "lunch" && r.servering === "varm")];
+    rubrik += " Det är dåligt väder ute, så en varm lunch passar också.";
+  }
+  return { rubrik, ratter };
 }
